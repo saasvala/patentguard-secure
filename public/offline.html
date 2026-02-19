@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline — NanoTech Management</title>
+  <style>
+    body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #0a0f1e; color: #c5ccd8; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .container { text-align: center; padding: 2rem; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #e2e8f0; }
+    p { font-size: 0.875rem; opacity: 0.6; }
+    button { margin-top: 1.5rem; padding: 0.75rem 2rem; background: linear-gradient(135deg, #1e3a5f, #2d8ac7); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>You're Offline</h1>
+    <p>NanoTech Management requires a connection for first load.<br/>Your data is safely cached locally.</p>
+    <button onclick="location.reload()">Retry Connection</button>
+  </div>
+</body>
+</html>

@@ -1,12 +1,27 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.24fe7a912bda48929ba160020a1f59a4',
-  appName: 'Patent Research Firm - No 13',
+  appId: 'com.nanotech.management',
+  appName: 'NanoTech Management',
   webDir: 'dist',
-  server: {
-    url: 'https://24fe7a91-2bda-4892-9ba1-60020a1f59a4.lovableproject.com?forceHideBadge=true',
-    cleartext: true,
+  android: {
+    allowMixedContent: false,
+    buildOptions: {
+      releaseType: 'APK',
+    },
+  },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: '#0a0f1e',
+      showSpinner: false,
+      androidScaleType: 'CENTER_CROP',
+    },
+    StatusBar: {
+      overlaysWebView: false,
+      style: 'DARK',
+      backgroundColor: '#0a0f1e',
+    },
   },
 };
 
