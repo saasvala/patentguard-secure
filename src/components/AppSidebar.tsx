@@ -17,6 +17,19 @@ const NAV_ITEMS = [
   { id: 'backup', label: 'Backup / Restore', icon: Database },
 ];
 
+// Role-based module access mapping
+const ROLE_ACCESS: Record<string, string[]> = {
+  'Super Admin': ['dashboard', 'projects', 'prior_art', 'applications', 'clients', 'cases', 'billing', 'reports', 'audit', 'backup', 'users'],
+  'Patent Director': ['dashboard', 'projects', 'prior_art', 'applications', 'clients', 'cases', 'reports'],
+  'Senior Patent Analyst': ['dashboard', 'projects', 'prior_art', 'applications', 'cases'],
+  'Patent Research Analyst': ['dashboard', 'projects', 'prior_art'],
+  'Legal Advisor': ['dashboard', 'projects', 'applications', 'cases'],
+  'Client Manager': ['dashboard', 'clients', 'billing', 'reports'],
+  'Documentation Officer': ['dashboard', 'projects', 'prior_art', 'applications'],
+  'Finance Officer': ['dashboard', 'billing', 'reports'],
+  'External Auditor': ['dashboard', 'projects', 'prior_art', 'applications', 'clients', 'cases', 'billing', 'reports', 'audit'],
+};
+
 const ADMIN_ITEMS = [
   { id: 'users', label: 'User Management', icon: UserCog },
 ];
