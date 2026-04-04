@@ -24,7 +24,7 @@ export default function UsersPage() {
     const updated = [...users, newUser];
     saveUsers(updated);
     setUsers(updated);
-    addAuditLog(getCurrentUser()?.id || 'system', `Created user: ${newUsername}`);
+    addAuditLog(getCurrentUser()?.id || 'system', 'users', `Created user: ${newUsername}`);
     setNewUsername('');
     setNewPassword('');
     setShowForm(false);
