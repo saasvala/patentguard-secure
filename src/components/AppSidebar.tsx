@@ -61,7 +61,7 @@ export default function AppSidebar({ activePage, onNavigate }: Props) {
 
       {/* Nav */}
       <nav className="flex-1 overflow-auto py-3 px-2 space-y-0.5">
-        {NAV_ITEMS.map(item => {
+        {NAV_ITEMS.filter(item => allowedModules.includes(item.id)).map(item => {
           const Icon = item.icon;
           const active = activePage === item.id;
           return (
