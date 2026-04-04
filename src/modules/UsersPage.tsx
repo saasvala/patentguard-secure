@@ -42,7 +42,7 @@ export default function UsersPage() {
     const updated = users.map(u => u.id === id ? { ...u, password: pwd } : u);
     saveUsers(updated);
     setUsers(updated);
-    addAuditLog(getCurrentUser()?.id || 'system', `Reset password for user: ${users.find(u => u.id === id)?.username}`);
+    addAuditLog(getCurrentUser()?.id || 'system', 'users', `Reset password for user: ${users.find(u => u.id === id)?.username}`);
   };
 
   return (
