@@ -17,6 +17,19 @@ const NAV_ITEMS = [
   { id: 'backup', label: 'Backup / Restore', icon: Database },
 ];
 
+// Role-based module access mapping
+const ROLE_ACCESS: Record<string, string[]> = {
+  'Super Admin': ['dashboard', 'projects', 'prior_art', 'applications', 'clients', 'cases', 'billing', 'reports', 'audit', 'backup', 'users'],
+  'Patent Director': ['dashboard', 'projects', 'prior_art', 'applications', 'clients', 'cases', 'reports'],
+  'Senior Patent Analyst': ['dashboard', 'projects', 'prior_art', 'applications', 'cases'],
+  'Patent Research Analyst': ['dashboard', 'projects', 'prior_art'],
+  'Legal Advisor': ['dashboard', 'projects', 'applications', 'cases'],
+  'Client Manager': ['dashboard', 'clients', 'billing', 'reports'],
+  'Documentation Officer': ['dashboard', 'projects', 'prior_art', 'applications'],
+  'Finance Officer': ['dashboard', 'billing', 'reports'],
+  'External Auditor': ['dashboard', 'projects', 'prior_art', 'applications', 'clients', 'cases', 'billing', 'reports', 'audit'],
+};
+
 const ADMIN_ITEMS = [
   { id: 'users', label: 'User Management', icon: UserCog },
 ];
@@ -28,8 +41,9 @@ interface Props {
 
 export default function AppSidebar({ activePage, onNavigate }: Props) {
   const { currentUser, currentRole, logout } = useAuth();
-
-  const isSuperAdmin = currentRole?.name === 'Super Admin';
+  const roleName = currentRole?.name || '';
+  const allowedModules = ROLE_ACCESS[roleName] || ['dashboard'];
+  const isSuperAdmin = roleName === 'Super Admin';
 
   return (
     <aside className="w-64 gradient-sidebar flex flex-col border-r border-sidebar-border shrink-0">
@@ -48,7 +62,7 @@ export default function AppSidebar({ activePage, onNavigate }: Props) {
 
       {/* Nav */}
       <nav className="flex-1 overflow-auto py-3 px-2 space-y-0.5">
-        {NAV_ITEMS.map(item => {
+        {NAV_ITEMS.filter(item => allowedModules.includes(item.id)).map(item => {
           const Icon = item.icon;
           const active = activePage === item.id;
           return (
