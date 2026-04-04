@@ -1,5 +1,6 @@
 import { DEFAULT_ROLES, type User, type Role, type Client, type Project, type PriorArt, type Application, type Case, type Billing, type AuditLog, type Backup, type License } from '@/types';
 import { generateHashSync } from '@/lib/security';
+import { addDeadline } from '@/lib/deadlines';
 
 const PREFIX = 'prfms_';
 
