@@ -1,18 +1,35 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogIn, Shield } from 'lucide-react';
+import { isAccountLocked, recordFailedLogin, clearFailedLogins, getLockRemainingTime } from '@/lib/security';
+import { LogIn, Shield, Lock } from 'lucide-react';
 
 export default function LoginScreen() {
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [lockMsg, setLockMsg] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLockMsg('');
+
+    if (isAccountLocked(username)) {
+      const remaining = Math.ceil(getLockRemainingTime(username) / 60000);
+      setLockMsg(`Account locked. Try again in ${remaining} minute(s).`);
+      return;
+    }
+
     if (!login(username, password)) {
-      setError('Invalid username or password');
+      const result = recordFailedLogin(username);
+      if (result.locked) {
+        setLockMsg('Account locked for 5 minutes due to too many failed attempts.');
+      } else {
+        setError(`Invalid credentials. ${result.remainingAttempts} attempt(s) remaining.`);
+      }
+    } else {
+      clearFailedLogins(username);
     }
   };
 
@@ -57,7 +74,13 @@ export default function LoginScreen() {
               />
             </div>
 
-            {error && <p className="text-xs text-destructive">{error}</p>}
+            {lockMsg && (
+              <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 p-3 rounded-lg">
+                <Lock className="w-4 h-4 shrink-0" />
+                {lockMsg}
+              </div>
+            )}
+            {error && !lockMsg && <p className="text-xs text-destructive">{error}</p>}
 
             <button type="submit" className="w-full py-3 gradient-primary text-primary-foreground rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity">
               Sign In

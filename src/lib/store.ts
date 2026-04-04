@@ -244,7 +244,6 @@ function initDummyData() {
   ]);
 
   // Init deadlines
-  const { addDeadline } = require('@/lib/deadlines');
   addDeadline({ project_id: 'p1', type: 'filing', title: 'US Patent Filing Deadline', due_date: '2025-06-15' });
   addDeadline({ project_id: 'p2', type: 'objection_response', title: 'EP Objection Response', due_date: '2025-05-01' });
   addDeadline({ project_id: 'p4', type: 'renewal', title: 'Patent Renewal Due', due_date: '2025-04-20' });
