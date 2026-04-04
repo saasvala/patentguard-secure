@@ -25,6 +25,8 @@ export default function ProjectsPage() {
       client_id: form.client_id || clients[0]?.id || '',
       title: form.title.trim(),
       status: form.status,
+      lifecycle_stage: 'idea',
+      version: 1,
       created_by: 'current',
       created_at: new Date().toISOString().split('T')[0],
     };

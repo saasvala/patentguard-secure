@@ -1,7 +1,8 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { getAccessibleModules } from '@/lib/rbac';
 import {
   LayoutDashboard, Search, FileText, FilePlus, Users, Briefcase,
-  Scale, Receipt, BarChart3, ClipboardList, Database, UserCog, LogOut, Shield
+  Scale, Receipt, BarChart3, ClipboardList, Database, UserCog, LogOut, Shield, Clock
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -11,24 +12,12 @@ const NAV_ITEMS = [
   { id: 'applications', label: 'Applications', icon: FilePlus },
   { id: 'clients', label: 'Client Management', icon: Users },
   { id: 'cases', label: 'Case Tracking', icon: Briefcase },
+  { id: 'deadlines', label: 'Deadlines & Alerts', icon: Clock },
   { id: 'billing', label: 'Billing & Invoicing', icon: Receipt },
   { id: 'reports', label: 'Reports & Export', icon: BarChart3 },
   { id: 'audit', label: 'Audit Logs', icon: ClipboardList },
   { id: 'backup', label: 'Backup / Restore', icon: Database },
 ];
-
-// Role-based module access mapping
-const ROLE_ACCESS: Record<string, string[]> = {
-  'Super Admin': ['dashboard', 'projects', 'prior_art', 'applications', 'clients', 'cases', 'billing', 'reports', 'audit', 'backup', 'users'],
-  'Patent Director': ['dashboard', 'projects', 'prior_art', 'applications', 'clients', 'cases', 'reports'],
-  'Senior Patent Analyst': ['dashboard', 'projects', 'prior_art', 'applications', 'cases'],
-  'Patent Research Analyst': ['dashboard', 'projects', 'prior_art'],
-  'Legal Advisor': ['dashboard', 'projects', 'applications', 'cases'],
-  'Client Manager': ['dashboard', 'clients', 'billing', 'reports'],
-  'Documentation Officer': ['dashboard', 'projects', 'prior_art', 'applications'],
-  'Finance Officer': ['dashboard', 'billing', 'reports'],
-  'External Auditor': ['dashboard', 'projects', 'prior_art', 'applications', 'clients', 'cases', 'billing', 'reports', 'audit'],
-};
 
 const ADMIN_ITEMS = [
   { id: 'users', label: 'User Management', icon: UserCog },
@@ -41,8 +30,9 @@ interface Props {
 
 export default function AppSidebar({ activePage, onNavigate }: Props) {
   const { currentUser, currentRole, logout } = useAuth();
+
   const roleName = currentRole?.name || '';
-  const allowedModules = ROLE_ACCESS[roleName] || ['dashboard'];
+  const allowedModules = getAccessibleModules(roleName);
   const isSuperAdmin = roleName === 'Super Admin';
 
   return (
