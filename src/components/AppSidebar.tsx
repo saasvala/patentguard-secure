@@ -41,8 +41,9 @@ interface Props {
 
 export default function AppSidebar({ activePage, onNavigate }: Props) {
   const { currentUser, currentRole, logout } = useAuth();
-
-  const isSuperAdmin = currentRole?.name === 'Super Admin';
+  const roleName = currentRole?.name || '';
+  const allowedModules = ROLE_ACCESS[roleName] || ['dashboard'];
+  const isSuperAdmin = roleName === 'Super Admin';
 
   return (
     <aside className="w-64 gradient-sidebar flex flex-col border-r border-sidebar-border shrink-0">
