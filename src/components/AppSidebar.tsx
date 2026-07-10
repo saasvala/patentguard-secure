@@ -1,8 +1,10 @@
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAccessibleModules } from '@/lib/rbac';
+import { ROLE_PERMISSIONS } from '@/types';
 import {
   LayoutDashboard, Search, FileText, FilePlus, Users, Briefcase,
-  Scale, Receipt, BarChart3, ClipboardList, Database, UserCog, LogOut, Shield, Clock
+  Scale, Receipt, BarChart3, ClipboardList, Database, UserCog, LogOut, Shield, Clock, ChevronsUpDown, Eye, Check
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -29,11 +31,31 @@ interface Props {
 }
 
 export default function AppSidebar({ activePage, onNavigate }: Props) {
-  const { currentUser, currentRole, logout } = useAuth();
+  const { currentUser, currentRole, logout, effectiveRoleName, viewAsRoleName, setViewAsRole } = useAuth();
 
-  const roleName = currentRole?.name || '';
+  const roleName = effectiveRoleName || currentRole?.name || '';
   const allowedModules = getAccessibleModules(roleName);
-  const isSuperAdmin = roleName === 'Super Admin';
+  const isSuperAdmin = currentRole?.name === 'Super Admin';
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const switcherRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (switcherRef.current && !switcherRef.current.contains(e.target as Node)) {
+        setSwitcherOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, []);
+
+  const allRoleNames = Object.keys(ROLE_PERMISSIONS);
+
+  const handleSwitchRole = (name: string | null) => {
+    setViewAsRole(name);
+    setSwitcherOpen(false);
+    onNavigate('dashboard');
+  };
 
   return (
     <aside className="w-64 gradient-sidebar flex flex-col border-r border-sidebar-border shrink-0">
@@ -100,11 +122,50 @@ export default function AppSidebar({ activePage, onNavigate }: Props) {
 
       {/* Footer */}
       <div className="border-t border-sidebar-border p-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="min-w-0">
+        <div className="flex items-center justify-between mb-2 gap-1">
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold text-sidebar-foreground truncate">{currentUser?.username}</p>
-            <p className="text-[10px] text-sidebar-foreground/50 truncate">{currentRole?.name}</p>
+            <p className="text-[10px] text-sidebar-foreground/50 truncate">
+              {currentRole?.name}
+              {viewAsRoleName && <span className="text-sidebar-primary"> · viewing {viewAsRoleName}</span>}
+            </p>
           </div>
+          {isSuperAdmin && (
+            <div className="relative" ref={switcherRef}>
+              <button
+                onClick={() => setSwitcherOpen(v => !v)}
+                className="p-1.5 rounded-md text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+                title="Switch role view"
+              >
+                <ChevronsUpDown className="w-4 h-4" />
+              </button>
+              {switcherOpen && (
+                <div className="absolute bottom-full right-0 mb-2 w-56 bg-sidebar-accent border border-sidebar-border rounded-lg shadow-elevated py-1 z-50 max-h-80 overflow-auto">
+                  <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">
+                    View Dashboard As
+                  </div>
+                  <button
+                    onClick={() => handleSwitchRole(null)}
+                    className="w-full flex items-center justify-between gap-2 px-3 py-1.5 text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent-foreground/10 transition-colors"
+                  >
+                    <span className="flex items-center gap-2"><Shield className="w-3 h-3" /> Super Admin (default)</span>
+                    {!viewAsRoleName && <Check className="w-3 h-3 text-sidebar-primary" />}
+                  </button>
+                  <div className="my-1 border-t border-sidebar-border" />
+                  {allRoleNames.filter(n => n !== 'Super Admin').map(name => (
+                    <button
+                      key={name}
+                      onClick={() => handleSwitchRole(name)}
+                      className="w-full flex items-center justify-between gap-2 px-3 py-1.5 text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent-foreground/10 transition-colors"
+                    >
+                      <span className="flex items-center gap-2"><Eye className="w-3 h-3" /> {name}</span>
+                      {viewAsRoleName === name && <Check className="w-3 h-3 text-sidebar-primary" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           <button
             onClick={logout}
             className="p-1.5 rounded-md text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
