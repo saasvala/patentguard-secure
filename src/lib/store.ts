@@ -142,6 +142,43 @@ export function logout() {
   setCurrentUser(null);
 }
 
+// Backup-key protected Super Admin reset
+export function verifyBackupKey(key: string): boolean {
+  const stored = get<string | null>('backup_key', null);
+  return key.trim() === (stored || BACKUP_KEY);
+}
+
+export function resetSuperAdminWithBackupKey(
+  backupKey: string,
+  newUsername: string,
+  newPassword: string,
+): { ok: boolean; error?: string } {
+  if (!verifyBackupKey(backupKey)) {
+    return { ok: false, error: 'Invalid backup key.' };
+  }
+  const users = getUsers();
+  const idx = users.findIndex(u => u.role_id === 'r1');
+  if (idx >= 0) {
+    users[idx] = {
+      ...users[idx],
+      username: newUsername,
+      password: newPassword,
+      status: 'active',
+    };
+  } else {
+    users.push({
+      id: crypto.randomUUID(),
+      role_id: 'r1',
+      username: newUsername,
+      password: newPassword,
+      status: 'active',
+    });
+  }
+  saveUsers(users);
+  addAuditLog('system', 'auth', `Super Admin credentials reset via backup key for ${newUsername}`);
+  return { ok: true };
+}
+
 export function getUserRole(user: User): Role | undefined {
   return getRoles().find(r => r.id === user.role_id);
 }
