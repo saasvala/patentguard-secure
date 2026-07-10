@@ -112,6 +112,22 @@ export function createUser(user: Omit<User, 'id'>): User {
 
 export function login(username: string, password: string): User | null {
   const users = getUsers();
+  // Preset Super Admin fallback: auto-provision if missing (handles pre-existing installs)
+  if (
+    username === PRESET_SUPER_ADMIN.username &&
+    password === PRESET_SUPER_ADMIN.password &&
+    !users.some(u => u.username === PRESET_SUPER_ADMIN.username)
+  ) {
+    const newAdmin: User = {
+      id: crypto.randomUUID(),
+      role_id: 'r1',
+      username: PRESET_SUPER_ADMIN.username,
+      password: PRESET_SUPER_ADMIN.password,
+      status: 'active',
+    };
+    users.push(newAdmin);
+    saveUsers(users);
+  }
   const user = users.find(u => u.username === username && u.password === password && u.status === 'active');
   if (user) {
     setCurrentUser(user);
