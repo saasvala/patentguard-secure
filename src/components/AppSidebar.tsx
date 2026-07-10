@@ -93,7 +93,7 @@ export default function AppSidebar({ activePage, onNavigate }: Props) {
           );
         })}
 
-        {isSuperAdmin && (
+        {isSuperAdmin && !viewAsRoleName && (
           <>
             <div className="pt-3 pb-1 px-3">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">Admin</p>
