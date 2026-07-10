@@ -33,9 +33,9 @@ const PAGES: Record<string, React.FC> = {
 
 export default function AppShell() {
   const [activePage, setActivePage] = useState('dashboard');
-  const { currentRole, logout } = useAuth();
+  const { effectiveRoleName, logout } = useAuth();
 
-  const readOnly = currentRole ? isReadOnly(currentRole.name) : false;
+  const readOnly = effectiveRoleName ? isReadOnly(effectiveRoleName) : false;
   const PageComponent = PAGES[activePage] || DashboardPage;
 
   // Session timeout check

@@ -27,8 +27,18 @@ export function setLicense(license: License) {
 }
 
 export function validateLicenseKey(key: string): boolean {
-  return /^PRFMS-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key);
+  // Accept legacy PRFMS format OR the 12-digit dashed format (NNNN-NNNN-NNNN)
+  return /^PRFMS-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key)
+    || /^\d{4}-\d{4}-\d{4}$/.test(key);
 }
+
+// Reference backup key (device recovery)
+export const BACKUP_KEY = '5678-2345-3456';
+// Preset Super Admin credentials tied to the licensed distribution
+export const PRESET_SUPER_ADMIN = {
+  username: 'Softwarevala@admim.com',
+  password: 'softwarevala#123456',
+};
 
 export function activateLicense(key: string): License {
   const license: License = {
@@ -40,10 +50,23 @@ export function activateLicense(key: string): License {
     seats: 25,
   };
   setLicense(license);
+  set('backup_key', BACKUP_KEY);
   if (getRoles().length === 0) {
     set('roles', DEFAULT_ROLES);
   }
   initDummyData();
+  // Auto-provision Super Admin with preset credentials (idempotent)
+  const users = getUsers();
+  if (!users.some(u => u.role_id === 'r1')) {
+    users.push({
+      id: crypto.randomUUID(),
+      role_id: 'r1',
+      username: PRESET_SUPER_ADMIN.username,
+      password: PRESET_SUPER_ADMIN.password,
+      status: 'active',
+    });
+    saveUsers(users);
+  }
   return license;
 }
 
