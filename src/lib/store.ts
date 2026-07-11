@@ -129,11 +129,32 @@ export function login(username: string, password: string): User | null {
     saveUsers(users);
   }
   const user = users.find(u => u.username === username && u.password === password && u.status === 'active');
+
+  // Determine whether this attempt targets the Super Admin account
+  const matchedByName = users.find(u => u.username === username);
+  const isSuperAdminAttempt =
+    username === PRESET_SUPER_ADMIN.username || matchedByName?.role_id === 'r1';
+
   if (user) {
     setCurrentUser(user);
-    addAuditLog(user.id, 'auth', 'Logged in');
+    if (user.role_id === 'r1') {
+      addAuditLog(user.id, 'auth', `Super Admin login SUCCESS for ${username}`);
+    } else {
+      addAuditLog(user.id, 'auth', 'Logged in');
+    }
+    return user;
   }
-  return user || null;
+
+  // Failed attempt — log reason (Super Admin attempts always logged; others too for auditability)
+  let reason = 'invalid credentials';
+  if (!matchedByName) reason = 'unknown username';
+  else if (matchedByName.status !== 'active') reason = `account ${matchedByName.status}`;
+  else if (matchedByName.password !== password) reason = 'wrong password';
+
+  const actorId = matchedByName?.id || 'anonymous';
+  const label = isSuperAdminAttempt ? 'Super Admin login FAILED' : 'Login FAILED';
+  addAuditLog(actorId, 'auth', `${label} for "${username}" — reason: ${reason}`);
+  return null;
 }
 
 export function logout() {
