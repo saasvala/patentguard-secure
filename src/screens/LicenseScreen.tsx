@@ -11,7 +11,7 @@ export default function LicenseScreen() {
     e.preventDefault();
     setError('');
     if (!activateLicense(key.trim().toUpperCase())) {
-      setError('Invalid license key. Format: PRFMS-XXXX-XXXX-XXXX');
+      setError('Invalid license key. Use 2345-3456-4567 or PRFMS-XXXX-XXXX-XXXX.');
     }
   };
 
@@ -45,7 +45,7 @@ export default function LicenseScreen() {
                 type="text"
                 value={key}
                 onChange={e => setKey(e.target.value.toUpperCase())}
-                placeholder="PRFMS-XXXX-XXXX-XXXX"
+                placeholder="2345-3456-4567"
                 className="w-full px-4 py-3 bg-license-bg border border-sidebar-border rounded-lg text-license-foreground font-mono text-sm tracking-widest placeholder:text-license-foreground/30 focus:outline-none focus:ring-2 focus:ring-license-accent/50 focus:border-license-accent transition-all"
                 maxLength={20}
               />
